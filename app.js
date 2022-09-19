@@ -29,11 +29,11 @@ const fileStorage = multer.diskStorage({
 })
 
 const fileFilter = (req, file, cb) => {
-    console.log(file,'-------filefile')
     if (
         file.mimetype === 'image/png' ||
         file.mimetype === 'image/jpg' ||
-        file.mimetype === 'image/jpeg'
+        file.mimetype === 'image/jpeg' ||
+        file.mimetype === 'image/webp'
     ) {
         cb(null, true)
     } else {
@@ -44,10 +44,6 @@ const fileFilter = (req, file, cb) => {
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('profile'));
 app.use('/images', express.static(path.join(__dirname, 'images')));
-
-
-
-
 
 app.post('/addUser',async (req,res,next) => {
     const {name, email, phone} = req.body;
@@ -62,10 +58,8 @@ app.post('/addUser',async (req,res,next) => {
 
     if (newUser){
         let createdUser = await newUser.save()
-        console.log(createdUser, "ccccccccccccccccc", imageUrl, name, email, phone)
         res.json({ message: "user added!", data: createdUser })
     }
-
 })
 
 
