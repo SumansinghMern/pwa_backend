@@ -15,7 +15,7 @@ app.use((req, res, next) => {
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization Boundary')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     next();
 })
 
@@ -42,7 +42,7 @@ const fileFilter = (req, file, cb) => {
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('profile'));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
@@ -50,16 +50,30 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
 app.post('/addUser',async (req,res,next) => {
-    // const {name, email, phone} = req.body;
+    const {name, email, phone} = req.body;
 
-    console.log(req.file, "ccccccccccccccccc", req.body)
-    // const image = req.file;
+    const image = req.file;
     
-    // const imageUrl = `http://localhost:5000/${image.path}`;
+    const imageUrl = `http://localhost:5000/${image.path}`;
+    
+    let newUser = new User({
+        name, email, phone, profilImage: imageUrl
+    })
 
-    // let createdUser = new User({
-    //     name, email, phone, profilImage: imageUrl
-    // })
+    if (newUser){
+        let createdUser = await newUser.save()
+        console.log(createdUser, "ccccccccccccccccc", imageUrl, name, email, phone)
+        res.json({ message: "user added!", data: createdUser })
+    }
+
+})
+
+
+app.get('/getUsers', async (req, res, next) => {
+   let allUsers = await User.find({})
+//    console.log("🚀 ~ file: app.js ~ line 74 ~ app.get ~ allUsers", allUsers)
+
+   res.status(200).json({message:'All Users', data: allUsers})
 
 })
 
