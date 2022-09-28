@@ -1,4 +1,5 @@
 const path = require('path')
+const ngrok = require('ngrok');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -50,7 +51,7 @@ app.post('/addUser',async (req,res,next) => {
 
     const image = req.file;
     
-    const imageUrl = `http://localhost:5000/${image.path}`;
+    const imageUrl = `/${image.path}`;
     
     let newUser = new User({
         name, email, phone, profilImage: imageUrl
@@ -65,7 +66,7 @@ app.post('/addUser',async (req,res,next) => {
 
 app.get('/getUsers', async (req, res, next) => {
    let allUsers = await User.find({})
-//    console.log("🚀 ~ file: app.js ~ line 74 ~ app.get ~ allUsers", allUsers)
+   console.log("🚀 ~ file: app.js ~ line 74 ~ app.get ~ allUsers", allUsers)
 
    res.status(200).json({message:'All Users', data: allUsers})
 
@@ -73,8 +74,9 @@ app.get('/getUsers', async (req, res, next) => {
 
 mongoose.connect(MONGODB_URI)
     .then((result) => {
-        app.listen(process.env.PORT || 5000, () => {
-            console.log("App is listning On 5000")
+        app.listen(process.env.PORT || 5000, async () => {
+            const url = await ngrok.connect({ proto: 'http', addr: 5000, authtoken: '2FOE7RnjivbHSeWmDifOR5E1b6T_3mWyN28DsTMzenHMUBkvG' });
+            console.log("App is listning On 5000", url)
         })
     })
     .catch(err => {
